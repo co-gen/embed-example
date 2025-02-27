@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dynamic Script Loader</title>
+    <style>
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      header {
+        text-align: center;
+        margin-bottom: 40px;
+      }
+      h1 {
+        color: #2c3e50;
+      }
+      .content {
+        background-color: #f9f9f9;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+      }
+      .script-input {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+      }
+      textarea {
+        width: 100%;
+        min-height: 150px;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-family: monospace;
+        margin-bottom: 10px;
+      }
+      button {
+        background-color: #3498db;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: bold;
+      }
+      button:hover {
+        background-color: #2980b9;
+      }
+      footer {
+        margin-top: 40px;
+        text-align: center;
+        font-size: 0.9em;
+        color: #7f8c8d;
+      }
+      #script-container {
+        margin-top: 20px;
+      }
+      .success-message {
+        background-color: #d4edda;
+        color: #155724;
+        padding: 10px;
+        border-radius: 4px;
+        margin-top: 10px;
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Dynamic Script Loader</h1>
+      <p>Paste your script snippet below and apply it to the page instantly</p>
+    </header>
+    
+    <div class="script-input">
+      <h2>Enter Script Snippet</h2>
+      <textarea id="script-code" placeholder="Paste your script snippet here..."><!--
+Paste this script at the bottom of your HTML before the </body> tag.
+See more style and config options on our docs
+https://github.com/co-gen-Labs/anything-llm/tree/master/embed/README.md
+-->
+<script
+  data-embed-id="5b300af4-5d73-4842-bac8-51871a085ca6"
+  data-base-api-url="https://nu.co-gen.co/api/embed"
+  src="https://nu.co-gen.co/embed/anythingllm-chat-widget.min.js">
+</script>
+<!-- CoGen (https://CoGen.com) --></textarea>
+      <button id="apply-script">Apply Script</button>
+      <div id="success-message" class="success-message">Script successfully applied to the page!</div>
+    </div>
+    
+    <div class="content">
+      <h2>About This Tool</h2>
+      <p>This tool allows you to dynamically add script snippets to the current page. It's useful for testing chat widgets, analytics tools, or other JavaScript-based embeds without having to modify the HTML file directly.</p>
+      
+      <h2>How to Use</h2>
+      <ol>
+        <li>Paste your script snippet in the text area above</li>
+        <li>Click the "Apply Script" button</li>
+        <li>The script will be executed and added to the page</li>
+      </ol>
+      
+      <h2>Current Scripts</h2>
+      <div id="script-container">
+        <p>No scripts currently applied. Use the form above to add a script.</p>
+      </div>
+    </div>
+    
+    <footer>
+      <p>&copy; 2025 Dynamic Script Loader | A Simple Developer Tool</p>
+    </footer>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const scriptTextarea = document.getElementById('script-code');
+        const applyButton = document.getElementById('apply-script');
+        const scriptContainer = document.getElementById('script-container');
+        const successMessage = document.getElementById('success-message');
+        
+        applyButton.addEventListener('click', function() {
+          const scriptContent = scriptTextarea.value.trim();
+          if (!scriptContent) {
+            alert('Please enter a script snippet first.');
+            return;
+          }
+          
+          try {
+            // Extract actual script tags from the content
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = scriptContent;
+            const scriptElements = tempDiv.querySelectorAll('script');
+            
+            if (scriptElements.length === 0) {
+              alert('No valid script tags found in the input.');
+              return;
+            }
+            
+            // Update the script container to show what's been added
+            scriptContainer.innerHTML = '<p>Applied Scripts:</p>';
+            const scriptList = document.createElement('ol');
+            scriptContainer.appendChild(scriptList);
+            
+            // Process each script element
+            scriptElements.forEach((script, index) => {
+              // Create a new script element
+              const newScript = document.createElement('script');
+              
+              // Copy all attributes
+              Array.from(script.attributes).forEach(attr => {
+                newScript.setAttribute(attr.name, attr.value);
+              });
+              
+              // Copy the content if it's an inline script
+              if (script.innerHTML) {
+                newScript.innerHTML = script.innerHTML;
+              }
+              
+              // Add to document
+              document.body.appendChild(newScript);
+              
+              // Add to the list of applied scripts
+              const listItem = document.createElement('li');
+              listItem.textContent = `Script ${index + 1}: ${script.src || 'Inline script'}`;
+              scriptList.appendChild(listItem);
+            });
+            
+            // Show success message
+            successMessage.style.display = 'block';
+            setTimeout(() => {
+              successMessage.style.display = 'none';
+            }, 3000);
+            
+          } catch (error) {
+            alert('Error applying script: ' + error.message);
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
